@@ -1,0 +1,63 @@
+module jkff_behave(clk,j,knq,qbar);
+
+input clk,j,k;
+output reg q,qbar;
+
+always@(posedge clk)
+begin
+if(k = 0)
+begin
+q <= 0;
+qbar <= 1;
+end
+always@(posedge clk)
+begin
+  if(k = 0)
+   begin
+    q <= 0;
+    qbar <= 1;
+   end
+  else if(j = 1)
+   begin
+    q <= 0;
+    qbar<= 0;
+   end
+  else if(j = 0 & k = 0)
+   begin
+    q <= q;
+    qbar <= qbar;
+   end
+  else if(j = 1 & k = 1)
+   begin
+    q <= ~q;
+    qbar <= ~qbar;
+   end
+end
+
+endmodule
+ 
+
+//////////////////////////////////////////////////////
+
+module jkff_test;
+reg j,k, clk;
+wire q, qbar;
+
+//2. Instantiate the module we want to test. We have instantiated the jkff_behavior
+jkff_behavior dut(.q(Q), .qbar(QBAR), .j(J), .k(K), .clk(CLK)); // instantiation by port name.
+
+//3. Monitor TB ports
+$monitor("simtime = %g, CLK = %b, J = %b, K = %b, Q = %b, QBAR = %b", $time, CLK, J, K, Q, QBAR);
+
+//4. apply test vectors
+initial begin
+  clk=0;
+     forever #10 clk = ~clk;  
+end 
+initial begin 
+ J= 1; K= 0;
+ #100; J= 0; K= 1; 
+ #100; J= 0; K= 0; 
+ #100; J= 1; K=1; 
+end 
+endmodule
